@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIFA CLASSIFIED — Case File #DW-2016-001</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=Oswald:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1a17;
+      --paper: #2a2a25;
+      --paper-light: #353530;
+      --border: rgba(255,255,255,0.08);
+      --text: #d4cfc4;
+      --text-dim: #8a857a;
+      --red: #c0392b;
+      --red-soft: rgba(192,57,43,0.15);
+      --red-glow: rgba(192,57,43,0.4);
+      --stamp-red: #e74c3c;
+      --gold: #d4a853;
+      --green: #27ae60;
+      --yellow: #f39c12;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Noise overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 9997;
+    }
+
+    /* ===== SPLASH ===== */
+    .splash {
+      position: fixed;
+      inset: 0;
+      background: #0a0a08;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      transition: opacity 0.8s, visibility 0.8s;
+    }
+    .splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .splash-border {
+      border: 3px solid var(--red);
+      padding: 3rem 4rem;
+      position: relative;
+      max-width: 650px;
+    }
+
+    .splash-corner { position: absolute; width: 20px; height: 20px; border-color: var(--red); border-style: solid; }
+    .splash-corner.tl { top: -3px; left: -3px; border-width: 3px 0 0 3px; }
+    .splash-corner.tr { top: -3px; right: -3px; border-width: 3px 3px 0 0; }
+    .splash-corner.bl { bottom: -3px; left: -3px; border-width: 0 0 3px 3px; }
+    .splash-corner.br { bottom: -3px; right: -3px; border-width: 0 3px 3px 0; }
+
+    .splash-stamp {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      font-weight: 700;
+      color: var(--stamp-red);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 30px var(--red-glow);
+      animation: stamp-pulse 3s ease-in-out infinite;
+    }
+    @keyframes stamp-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+    .splash-subtitle {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      line-height: 1.8;
+    }
+
+    .splash-case {
+      font-family: 'Special Elite', cursive;
+      font-size: 1rem;
+      color: var(--yellow);
+      margin-bottom: 2.5rem;
+    }
+
+    .clearance-btn {
+      padding: 1rem 3rem;
+      background: transparent;
+      border: 2px solid var(--red);
+      color: var(--red);
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .clearance-btn:hover { background: var(--red); color: white; }
+    .clearance-btn::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.5s;
+    }
+    .clearance-btn:hover::after { left: 100%; }
+
+    .splash-warning {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      opacity: 0.4;
+      margin-top: 2rem;
+      max-width: 400px;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 clamp(1.5rem, 5vw, 3rem); position: relative; z-index: 1; }
+
+    .case-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9998;
+      padding: 0.5rem 2rem;
+      background: rgba(10,10,8,0.95);
+      border-bottom: 1px solid var(--red);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: all 0.5s;
+    }
+    .case-header.visible { opacity: 1; transform: translateY(0); }
+    .case-header .blink { animation: blink 1s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 0.75rem;
+    }
+
+    .stamp {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--stamp-red);
+      border: 3px solid var(--stamp-red);
+      padding: 0.5rem 1.5rem;
+      display: inline-block;
+      transform: rotate(-3deg);
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+    }
+
+    .redacted {
+      background: var(--text);
+      color: var(--text);
+      padding: 0 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+      user-select: none;
+    }
+    .redacted:hover, .redacted.revealed { background: transparent; color: var(--yellow); }
+
+    .section-divider {
+      text-align: center;
+      padding: 3rem 0;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+    .section-divider::before, .section-divider::after {
+      content: '━━━━━━━━━━━━';
+      display: block;
+      color: var(--red);
+      opacity: 0.3;
+      margin: 0.5rem 0;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero-file-tab {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--yellow);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeIn 1s ease-out 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeIn 1s ease-out 0.4s forwards;
+    }
+    .hero-title .highlight { color: var(--stamp-red); }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      padding: 1.5rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--red);
+      opacity: 0;
+      animation: fadeIn 1s ease-out 0.6s forwards;
+    }
+
+    .meta-item label {
+      display: block;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.25rem;
+    }
+    .meta-item span { font-size: 0.85rem; color: var(--text); }
+    .meta-item span.red { color: var(--stamp-red); font-weight: 700; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ===== SECTIONS ===== */
+    section { padding: clamp(4rem, 10vw, 7rem) 0; }
+
+    .section-header {
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+
+    .section-number {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--red);
+      letter-spacing: 0.3em;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ===== CASE SUMMARY ===== */
+    .anomaly-box {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--red);
+      padding: 2rem;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .anomaly-box::after {
+      content: 'ANOMALY';
+      position: absolute;
+      top: 1rem; right: 1rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.7rem;
+      color: var(--stamp-red);
+      border: 2px solid var(--stamp-red);
+      padding: 0.25rem 0.75rem;
+      transform: rotate(3deg);
+      letter-spacing: 0.1em;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .stat-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    .stat-card.flagged { border-color: var(--red); }
+    .stat-card.flagged::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: circle-pulse 2s ease-in-out infinite;
+    }
+    @keyframes circle-pulse { 0%,100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.05); opacity: 0.8; } }
+
+    .stat-number {
+      font-family: 'Oswald', sans-serif;
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .stat-number.red { color: var(--stamp-red); }
+    .stat-number.gold { color: var(--gold); }
+    .stat-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    /* ===== EVIDENCE BOARD ===== */
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .evidence-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      position: relative;
+    }
+    .evidence-card .team-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+      color: var(--gold);
+    }
+    .evidence-card .team-years {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .evidence-card .team-stats {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .evidence-card .team-stats div {
+      text-align: center;
+    }
+    .evidence-card .team-stats .num {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .evidence-card .team-stats .lbl {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.5rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .evidence-card .assist-note {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--stamp-red);
+      font-style: italic;
+    }
+
+    .evidence-pin {
+      position: absolute;
+      top: -8px; right: 16px;
+      width: 16px; height: 16px;
+      background: var(--red);
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* ===== THE ASSIST ===== */
+    .the-assist {
+      background: var(--paper);
+      border: 2px solid var(--yellow);
+      padding: 3rem;
+      position: relative;
+      text-align: center;
+    }
+
+    .the-assist .classified-stamp {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(-15deg);
+      font-family: 'Oswald', sans-serif;
+      font-size: 5rem;
+      font-weight: 700;
+      color: rgba(231,76,60,0.08);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .the-assist h3 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .typewriter {
+      font-family: 'Special Elite', cursive;
+      font-size: 1.1rem;
+      line-height: 2;
+      color: var(--text);
+      max-width: 600px;
+      margin: 0 auto;
+      min-height: 120px;
+    }
+
+    .eyewitness {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(0,0,0,0.3);
+      border-left: 3px solid var(--yellow);
+      text-align: left;
+    }
+
+    .eyewitness .witness-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+    .eyewitness blockquote {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+    .eyewitness cite {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-style: normal;
+    }
+
+    /* ===== PSYCH PROFILE ===== */
+    .psych-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+    }
+    .psych-item {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+    .psych-item:nth-child(even) { border-right: none; }
+    .psych-item .psych-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+    .psych-item .psych-value {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .psych-item .psych-value.red { color: var(--stamp-red); }
+
+    .psych-conclusion {
+      background: var(--red-soft);
+      border: 1px solid var(--red);
+      padding: 2rem;
+      margin-top: 2rem;
+      font-family: 'Special Elite', cursive;
+      font-size: 1rem;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    /* ===== TEAM NAME ANALYSIS ===== */
+    .team-analysis {
+      margin-bottom: 2rem;
+      padding: 2rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .team-analysis .codename {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.3rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .team-analysis .analysis-text {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+    .team-analysis .threat-level {
+      margin-top: 1rem;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+    .threat-high { color: var(--stamp-red); }
+    .threat-medium { color: var(--yellow); }
+    .threat-low { color: var(--green); }
+
+    /* ===== PASS PROBABILITY CALCULATOR ===== */
+    .calculator {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .calc-form { margin-bottom: 1.5rem; }
+    .calc-field {
+      margin-bottom: 1rem;
+    }
+    .calc-field label {
+      display: block;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 0.5rem;
+    }
+    .calc-field select, .calc-field input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.9rem;
+    }
+    .calc-field select:focus, .calc-field input:focus { outline: none; border-color: var(--yellow); }
+
+    .calc-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--red);
+      border: 2px solid var(--red);
+      color: white;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .calc-btn:hover { background: transparent; color: var(--red); }
+
+    .calc-result {
+      display: none;
+      margin-top: 2rem;
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--red);
+    }
+    .calc-result.visible { display: block; animation: fadeIn 0.5s ease-out; }
+
+    .calc-result .probability {
+      font-family: 'Oswald', sans-serif;
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--stamp-red);
+      line-height: 1;
+    }
+    .calc-result .prob-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-top: 0.5rem;
+    }
+    .calc-result .prob-note {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+
+    /* ===== TESTIMONIALS ===== */
+    .testimony {
+      padding: 2rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--red);
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .testimony::before {
+      content: '"';
+      font-family: 'Oswald', sans-serif;
+      font-size: 4rem;
+      color: var(--red);
+      opacity: 0.15;
+      position: absolute;
+      top: 0.5rem; left: 1rem;
+      line-height: 1;
+    }
+    .testimony blockquote {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .testimony cite {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-style: normal;
+    }
+    .testimony .redacted-name {
+      background: var(--text-dim);
+      color: var(--text-dim);
+      padding: 0 8px;
+    }
+
+    /* ===== TESTIMONY GENERATOR ===== */
+    .generator-box {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .generator-btn {
+      padding: 0.75rem 2rem;
+      background: transparent;
+      border: 2px solid var(--yellow);
+      color: var(--yellow);
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .generator-btn:hover { background: var(--yellow); color: var(--bg); }
+    .generated-testimony {
+      margin-top: 1.5rem;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+      display: none;
+    }
+    .generated-testimony.visible { display: block; animation: fadeIn 0.5s; }
+
+    /* ===== VERDICT ===== */
+    .verdict-section {
+      text-align: center;
+      padding: 5rem 2rem;
+      position: relative;
+    }
+    .verdict-stamp {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 700;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 40px rgba(39,174,96,0.3);
+      transform: rotate(-5deg);
+      display: inline-block;
+      border: 5px solid var(--green);
+      padding: 0.5rem 2rem;
+      margin-bottom: 2rem;
+    }
+    .verdict-text {
+      font-family: 'Special Elite', cursive;
+      font-size: 1.1rem;
+      color: var(--text);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 2;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 4rem 2rem;
+      text-align: center;
+      border-top: 1px solid var(--red);
+      background: rgba(0,0,0,0.3);
+    }
+    .footer-seal {
+      width: 80px; height: 80px;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+    }
+    .footer-org {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.9rem;
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+    .footer-division {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      margin-bottom: 2rem;
+    }
+    .footer-disclaimer {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      opacity: 0.4;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ===== ASSIST COUNTER (fixed) ===== */
+    .assist-tracker {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      z-index: 9999;
+      padding: 1rem 1.5rem;
+      background: rgba(42,42,37,0.95);
+      border: 1px solid var(--red);
+      font-family: 'Roboto Mono', monospace;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .assist-tracker.visible { opacity: 1; }
+    .assist-tracker .at-label {
+      font-size: 0.5rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.25rem;
+    }
+    .assist-tracker .at-value {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--stamp-red);
+      line-height: 1;
+    }
+    .assist-tracker .at-note {
+      font-size: 0.5rem;
+      color: var(--stamp-red);
+      margin-top: 0.25rem;
+    }
+
+    /* Easter egg: Konami code */
+    .easter-egg-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 20000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .easter-egg-overlay.active { display: flex; }
+    .easter-egg-overlay .ee-content {
+      max-width: 500px;
+    }
+    .easter-egg-overlay h2 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .easter-egg-overlay p {
+      font-family: 'Special Elite', cursive;
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    .easter-egg-overlay .close-ee {
+      padding: 0.75rem 2rem;
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: 'Oswald', sans-serif;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .stat-row { grid-template-columns: 1fr; }
+      .evidence-grid { grid-template-columns: 1fr; }
+      .psych-grid { grid-template-columns: 1fr; }
+      .psych-item { border-right: none; }
+      .hero-meta { grid-template-columns: 1fr 1fr; }
+      .assist-tracker { bottom: 1rem; right: 1rem; padding: 0.75rem 1rem; }
+      .assist-tracker .at-value { font-size: 1.5rem; }
+      .splash-border { padding: 2rem; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-meta { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== SPLASH ===== -->
+<div class="splash" id="splash">
+  <div class="splash-border">
+    <div class="splash-corner tl"></div>
+    <div class="splash-corner tr"></div>
+    <div class="splash-corner bl"></div>
+    <div class="splash-corner br"></div>
+    <div class="splash-stamp">CLASSIFIED</div>
+    <div class="splash-subtitle">
+      FIFA Internal Affairs Division<br>
+      Downsview Park Bureau of Investigation
+    </div>
+    <div class="splash-case">Case File #DW-2016-001 — Security Clearance Required</div>
+    <button class="clearance-btn" id="enterBtn">Confirm Security Clearance</button>
+    <p class="splash-warning">By proceeding, you acknowledge that the contents of this file may permanently alter your understanding of recreational adult league soccer. FIFA Internal Affairs accepts no liability for existential crises triggered by these findings.</p>
+  </div>
+</div>
+
+<!-- ===== FIXED ELEMENTS ===== -->
+<div class="case-header" id="caseHeader">
+  <span>FIFA Internal Affairs — Case #DW-2016-001</span>
+  <span><span class="blink">●</span> ACTIVE INVESTIGATION</span>
+</div>
+
+<div class="assist-tracker" id="assistTracker">
+  <div class="at-label">Career Assists</div>
+  <div class="at-value">1</div>
+  <div class="at-note">Since 2015</div>
+</div>
+
+<!-- ===== EASTER EGG OVERLAY ===== -->
+<div class="easter-egg-overlay" id="easterEgg">
+  <div class="ee-content">
+    <h2>🦍 HARAMBE MEMORIAL FILE 🦍</h2>
+    <p>CLASSIFIED ADDENDUM: Darren Weltman named his team "Harambe FC" in 2016, the year Harambe ascended. During the Harambe FC era, Weltman scored 10 goals in 23 games — his highest goals-per-game ratio. Coincidence? FIFA Internal Affairs thinks not. Harambe's spirit channeled through Weltman's right foot. Still zero assists though.</p>
+    <button class="close-ee" onclick="document.getElementById('easterEgg').classList.remove('active')">Close File</button>
+  </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-file-tab">Section 1.0 — Executive Summary</div>
+    <h1 class="hero-title">
+      An Official FIFA Investigation Into the <span class="highlight">Statistical Anomaly</span> of Darren Weltman
+    </h1>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <label>Subject</label>
+        <span>Darren Weltman</span>
+      </div>
+      <div class="meta-item">
+        <label>Occupation</label>
+        <span>Co-Founder, Balmoral Capital</span>
+      </div>
+      <div class="meta-item">
+        <label>League</label>
+        <span>Downsview Park Adult Soccer</span>
+      </div>
+      <div class="meta-item">
+        <label>Games Played</label>
+        <span>120</span>
+      </div>
+      <div class="meta-item">
+        <label>Goals</label>
+        <span>34</span>
+      </div>
+      <div class="meta-item">
+        <label>Assists</label>
+        <span class="red">1</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CASE SUMMARY ===== -->
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-number">Section 2.0</div>
+      <div class="label">Case Summary</div>
+      <h2 class="section-title">The Statistical Anomaly</h2>
+    </div>
+    <div class="anomaly-box reveal">
+      <p>On <strong>March 14, 2024</strong>, FIFA's Statistical Monitoring Division flagged an irregularity originating from the <strong>Downsview Park Adult Soccer League</strong>, Toronto, Ontario, Canada.</p>
+      <br>
+      <p>A player identified as <strong>DARREN WELTMAN</strong> (Western University, Class of 2014) had accumulated <strong>34 goals</strong> across <strong>120 matches</strong> — a respectable record by any measure. However, cross-referencing revealed that in the same 120-match span, the subject had registered only <strong style="color: var(--stamp-red);">ONE (1) assist</strong>.</p>
+      <br>
+      <p>The ratio of 34:1 (goals to assists) represents a statistical deviation of <strong>47 standard deviations</strong> from the league mean. For context, the probability of this occurring naturally is approximately <span class="redacted" onclick="this.classList.toggle('revealed')">1 in 3.7 trillion</span>.</p>
+      <br>
+      <p>This finding triggered an immediate <strong>Level 5 Investigation</strong> — the first ever issued for a recreational adult league.</p>
+    </div>
+    <div class="stat-row reveal">
+      <div class="stat-card">
+        <div class="stat-number gold">120</div>
+        <div class="stat-label">Games Played</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">34</div>
+        <div class="stat-label">Goals Scored</div>
+      </div>
+      <div class="stat-card flagged">
+        <div class="stat-number red">1</div>
+        <div class="stat-label">Assist — Singular</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">· · · Evidence Exhibits · · ·</div>
+
+<!-- ===== EVIDENCE BOARD ===== -->
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-number">Section 3.0</div>
+      <div class="label">Evidence Board</div>
+      <h2 class="section-title">Forensic Breakdown by Team</h2>
+    </div>
+    <p class="reveal" style="color: var(--text-dim); margin-bottom: 2rem; font-size: 0.85rem;">The following exhibits detail the subject's statistical record across each known operational unit. Note the consistent pattern: goals are accumulated, assists are not distributed.</p>
+    <div class="evidence-grid reveal">
+      <div class="evidence-card">
+        <div class="evidence-pin"></div>
+        <div class="team-name">🦍 Harambe FC</div>
+        <div class="team-years">2016–2017 · 23 Appearances</div>
+        <div class="team-stats">
+          <div><div class="num" style="color: var(--gold);">10</div><div class="lbl">Goals</div></div>
+          <div><div class="num" style="color: var(--stamp-red);">0</div><div class="lbl">Assists</div></div>
+          <div><div class="num">.43</div><div class="lbl">Goals/Game</div></div>
+        </div>
+        <div class="assist-note">Peak performance era. Zero distribution. Harambe would have passed.</div>
+      </div>
+      <div class="evidence-card">
+        <div class="evidence-pin"></div>
+        <div class="team-name">Yaya Kolo Toure FC</div>
+        <div class="team-years">2015–2016 · 44 Appearances</div>
+        <div class="team-stats">
+          <div><div class="num" style="color: var(--gold);">12</div><div class="lbl">Goals</div></div>
+          <div><div class="num" style="color: var(--stamp-red);">0</div><div class="lbl">Assists</div></div>
+          <div><div class="num">.27</div><div class="lbl">Goals/Game</div></div>
+        </div>
+        <div class="assist-note">Named after brothers who famously played TOGETHER. The irony was not lost on investigators.</div>
+      </div>
+      <div class="evidence-card">
+        <div class="evidence-pin"></div>
+        <div class="team-name">FTB United</div>
+        <div class="team-years">2015–2016 · 40 Appearances</div>
+        <div class="team-stats">
+          <div><div class="num" style="color: var(--gold);">10</div><div class="lbl">Goals</div></div>
+          <div><div class="num" style="color: var(--green);">1</div><div class="lbl">Assist</div></div>
+          <div><div class="num">.25</div><div class="lbl">Goals/Game</div></div>
+        </div>
+        <div class="assist-note">⚠️ THE ASSIST OCCURRED HERE. See Section 4.0 for full incident report.</div>
+      </div>
+      <div class="evidence-card">
+        <div class="evidence-pin"></div>
+        <div class="team-name">FC Sixelona</div>
+        <div class="team-years">2016 · 13 Appearances</div>
+        <div class="team-stats">
+          <div><div class="num" style="color: var(--gold);">2</div><div class="lbl">Goals</div></div>
+          <div><div class="num" style="color: var(--stamp-red);">0</div><div class="lbl">Assists</div></div>
+          <div><div class="num">.15</div><div class="lbl">Goals/Game</div></div>
+        </div>
+        <div class="assist-note">Named after Barcelona — a team famous for tiki-taka passing. Subject did not get the memo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">· · · Incident Report · · ·</div>
+
+<!-- ===== THE ASSIST ===== -->
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-number">Section 4.0</div>
+      <div class="label">Incident Report</div>
+      <h2 class="section-title">The Assist</h2>
+    </div>
+    <div class="the-assist reveal" id="theAssist">
+      <div class="classified-stamp">CLASSIFIED</div>
+      <h3>The Singular Event</h3>
+      <div class="typewriter" id="typewriterText"></div>
+      <div class="eyewitness" style="margin-top: 2rem;">
+        <div class="witness-label">Eyewitness Account #1 — Teammate (Name Withheld)</div>
+        <blockquote>"I'd been open for three seasons. Three. Entire. Seasons. I'd stopped making runs. I'd accepted my role as a spectator who happened to be on the field. Then suddenly — the ball came to me. I was so shocked I almost didn't shoot. I looked around to see if it was a mistake. It was a mistake. He later told me the sun was in his eyes."</blockquote>
+        <cite>— <span class="redacted-name">████████</span>, FTB United, Position: Perpetually Open</cite>
+      </div>
+      <div class="eyewitness">
+        <div class="witness-label">Eyewitness Account #2 — Opposing Goalkeeper</div>
+        <blockquote>"I've played against Weltman nine times. He always shoots. ALWAYS. When he passed that day, I was already diving to block his shot. The ball went to his teammate on the opposite side of the pitch. I wasn't even facing the right direction. Nobody was prepared for generosity."</blockquote>
+        <cite>— <span class="redacted-name">████████</span>, Opposing Team, Position: Confused</cite>
+      </div>
+      <div class="eyewitness">
+        <div class="witness-label">Eyewitness Account #3 — The Referee</div>
+        <blockquote>"In 12 years of officiating at Downsview Park, I have never stopped play to applaud. But when Darren Weltman passed that ball, I blew the whistle out of pure shock. I then had to pretend it was for an offside. It wasn't offside."</blockquote>
+        <cite>— <span class="redacted-name">████████</span>, DPASL Match Official</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">· · · Psychological Assessment · · ·</div>
+
+<!-- ===== PSYCHOLOGICAL PROFILE ===== -->
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-number">Section 5.0</div>
+      <div class="label">Psychological Profile</div>
+      <h2 class="section-title">Subject Assessment</h2>
+    </div>
+    <p class="reveal" style="color: var(--text-dim); margin-bottom: 2rem; font-size: 0.85rem;">FIFA Internal Affairs contracted independent behavioral analysts to establish whether the subject's on-field conduct correlates with broader life patterns.</p>
+    <div class="psych-grid reveal">
+      <div class="psych-item">
+        <div class="psych-label">Professional Role</div>
+        <div class="psych-value">Co-Founder & Managing Partner, Balmoral Capital — Real Estate Capital Advisory</div>
+      </div>
+      <div class="psych-item">
+        <div class="psych-label">Professional Behavior</div>
+        <div class="psych-value red">Acquires financing, structures deals, accumulates capital. Does not distribute.</div>
+      </div>
+      <div class="psych-item">
+        <div class="psych-label">Education</div>
+        <div class="psych-value">Western University (2010-2014). Subject accumulated a degree. Did not pass it to teammates.</div>
+      </div>
+      <div class="psych-item">
+        <div class="psych-label">Previous Employment</div>
+        <div class="psych-value">VP at AccessEasyFunds. Accessed funds. Did not make them easy for others to access.</div>
+      </div>
+      <div class="psych-item">
+        <div class="psych-label">Media Appearances</div>
+        <div class="psych-value">"The Speakers Society" podcast. Subject spoke. At no point did he pass the microphone.</div>
+      </div>
+      <div class="psych-item">
+        <div class="psych-label">Diagnosis</div>
+        <div class="psych-value red">Consistent accumulation behavior across all domains. Ball, capital, microphones — subject acquires and retains.</div>
+      </div>
+    </div>
+    <div class="psych-conclusion reveal">
+      <span class="stamp" style="margin-bottom: 1rem;">FINDING</span>
+      <p style="margin-top: 1rem;">Subject displays a consistent behavioral pattern classified as <strong>"Acute Distributive Aversion"</strong> — an inability or unwillingness to transfer assets (balls, capital, opportunities) to other parties. This pattern is persistent across professional, educational, and recreational domains. It is the opinion of this panel that Darren Weltman does not refuse to pass. He is <em>constitutionally incapable</em> of passing.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">· · · Intelligence Analysis · · ·</div>
+
+<!-- ===== TEAM NAME ANALYSIS ===== -->
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-number">Section 6.0</div>
+      <div class="label">Intelligence Analysis</div>
+      <h2 class="section-title">Team Name Decryption</h2>
+    </div>
+    <p class="reveal" style="color: var(--text-dim); margin-bottom: 2rem; font-size: 0.85rem;">Cryptanalysts were engaged to decode the subject's team names for hidden psychological indicators.</p>
+    <div class="team-analysis reveal">
+      <div class="codename">🦍 "Harambe FC"</div>
+      <div class="analysis-text">Named after the gorilla who was taken too soon. Like Harambe, Weltman was a powerful creature operating in an enclosure (Downsview Park) who did things his own way regardless of what the crowd wanted. Unlike Harambe, Weltman had the ball and refused to let go of it. The team's 10 goals in 23 games represent Weltman's most prolific era — fueled, investigators believe, by the raw spiritual energy of Harambe himself.</div>
+      <div class="threat-level threat-high">Threat Level: ELEVATED — Subject emotionally compromised by primate martyrdom</div>
+    </div>
+    <div class="team-analysis reveal">
+      <div class="codename">"Yaya Kolo Toure FC"</div>
+      <div class="analysis-text">Named after the Touré brothers — Yaya and Kolo — who famously played TOGETHER at Manchester City, passing to each other, celebrating together, being teammates in the truest sense of the word. Weltman named his team after brothers who shared. He then refused to share anything. Investigators classify this as either profound irony or an elaborate psychological taunt directed at his own teammates.</div>
+      <div class="threat-level threat-high">Threat Level: SEVERE — Deliberate psychological warfare against own squad</div>
+    </div>
+    <div class="team-analysis reveal">
+      <div class="codename">"FTB United"</div>
+      <div class="analysis-text">The word "United" implies togetherness, collaboration, and collective effort. This team is where The Assist occurred (see Section 4.0), suggesting that the name may have briefly influenced the subject's behavior before he reverted to standard operating procedure. "FTB" remains undecrypted. Analysts suspect it stands for <span class="redacted" onclick="this.classList.toggle('revealed')">"For The Ball"</span> — a personal mantra.</div>
+      <div class="threat-level threat-medium">Threat Level: MODERATE — Name briefly caused passing behavior (now resolved)</div>
+    </div>
+    <div class="team-analysis reveal">
+      <div class="codename">"FC Sixelona"</div>
+      <div class="analysis-text">A clear reference to FC Barcelona, the Spanish club synonymous with tiki-taka — a style of play built entirely around short, precise passing. Weltman named his team after the greatest passing team in football history and then scored 2 goals and recorded 0 assists in 13 matches. This is the investigative equivalent of naming your restaurant "The Vegan Kitchen" and serving exclusively steak.</div>
+      <div class="threat-level threat-high">Threat Level: MAXIMUM — Subject is mocking the very concept of passing</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">· · · Interactive Assessment · · ·</div>
+
+<!-- ===== PASS PROBABILITY CALCULATOR ===== -->
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-number">Section 7.0</div>
+      <div class="label">Predictive Modeling</div>
+      <h2 class="section-title">Pass Probability Calculator</h2>
+    </div>
+    <p class="reveal" style="color: var(--text-dim); margin-bottom: 2rem; font-size: 0.85rem; text-align: center;">Using FIFA's proprietary behavioral modeling engine, calculate the probability that Darren Weltman will pass in any given situation.</p>
+    <div class="calculator reveal">
+      <div class="calc-form">
+        <div class="calc-field">
+          <label>Game Situation</label>
+          <select id="situation">
+            <option>Teammate is wide open, 2 yards from goal</option>
+            <option>Teammate is screaming for the ball</option>
+            <option>3 defenders between Weltman and goal</option>
+            <option>Goalkeeper has already saved 4 of his shots</option>
+            <option>It's a charity match for orphans</option>
+            <option>His own mother is the open teammate</option>
+            <option>A pass would literally win the league</option>
+            <option>He's surrounded by 6 defenders</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label>Minutes Remaining</label>
+          <select id="minutes">
+            <option>90 (Full game ahead)</option>
+            <option>45 (Second half)</option>
+            <option>10 (Desperate times)</option>
+            <option>1 (Last minute)</option>
+            <option>Added time (Beyond desperate)</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label>Score Differential</label>
+          <select id="scoreDiff">
+            <option>Winning by 5+</option>
+            <option>Winning by 1</option>
+            <option>Tied</option>
+            <option>Losing by 1</option>
+            <option>Losing by 5+</option>
+          </select>
+        </div>
+        <button class="calc-btn" id="calcBtn">Calculate Pass Probability</button>
+      </div>
+      <div class="calc-result" id="calcResult">
+        <div class="probability" id="probValue">0.83%</div>
+        <div class="prob-label">Probability of Pass</div>
+        <div class="prob-note" id="probNote">Analysis complete.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">· · · Witness Statements · · ·</div>
+
+<!-- ===== TEAMMATE TESTIMONIALS ===== -->
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-number">Section 8.0</div>
+      <div class="label">Witness Statements</div>
+      <h2 class="section-title">Teammate Testimonials</h2>
+    </div>
+    <p class="reveal" style="color: var(--text-dim); margin-bottom: 2rem; font-size: 0.85rem;">The following statements were collected under oath from individuals who played alongside the subject. Names have been withheld for their emotional protection.</p>
+
+    <div class="testimony reveal">
+      <blockquote>"I made 847 runs over three seasons. I tracked them. I have a spreadsheet. Darren looked up exactly once, and I'm pretty sure he was checking the weather. I have since retired from soccer and taken up individual sports. I run marathons now. Nobody can refuse to pass to me in a marathon."</blockquote>
+      <cite><span class="redacted-name">████████</span> — Midfielder, Harambe FC, 2016-2017</cite>
+    </div>
+
+    <div class="testimony reveal">
+      <blockquote>"There was a moment in the 73rd minute — I'll never forget it — where I was completely alone in front of goal. Not a defender in sight. I raised my hand. I called his name. He looked at me. Our eyes met. And then he turned and shot from 35 yards out. It went over the stadium. We play at a park. There is no stadium. It went over the parking lot."</blockquote>
+      <cite><span class="redacted-name">████████</span> — Striker, Yaya Kolo Toure FC, 2015-2016</cite>
+    </div>
+
+    <div class="testimony reveal">
+      <blockquote>"My therapist says I have trust issues. I traced it back to playing with Darren. When someone at work says 'I'll pass that along to you,' I physically flinch. The word 'pass' triggers me. I can't watch football anymore. I can't eat pasta — it sounds too much like 'pass-ta.' I'm healing, but slowly."</blockquote>
+      <cite><span class="redacted-name">████████</span> — Right Wing, FTB United, 2015-2016</cite>
+    </div>
+
+    <div class="testimony reveal">
+      <blockquote>"I want to be clear: Darren is a wonderful person off the field. Generous, kind, always buys the post-game drinks. But the second he crosses that white line, he undergoes a transformation. The ball becomes his precious. We are not teammates. We are witnesses."</blockquote>
+      <cite><span class="redacted-name">████████</span> — Defender, FC Sixelona, 2016</cite>
+    </div>
+
+    <div class="generator-box reveal">
+      <p style="font-family: 'Roboto Mono', monospace; font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem;">Declassified Testimony Generator</p>
+      <button class="generator-btn" id="generateBtn">Generate New Testimony</button>
+      <div class="generated-testimony" id="generatedTestimony"></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">· · · Final Determination · · ·</div>
+
+<!-- ===== THE VERDICT ===== -->
+<section class="verdict-section">
+  <div class="container reveal">
+    <div class="section-number" style="text-align: center;">Section 9.0</div>
+    <div class="label" style="text-align: center;">Final Determination</div>
+    <br>
+    <div class="verdict-stamp">LEGEND</div>
+    <div class="verdict-text">
+      <p>After exhaustive investigation, FIFA Internal Affairs — Downsview Park Division — has reached the following conclusion:</p>
+      <br>
+      <p>While Darren Weltman's 34:1 goal-to-assist ratio represents the most statistically improbable distribution in the history of organized sport, the committee finds that this is not a deficiency.</p>
+      <br>
+      <p><strong>It is a style.</strong></p>
+      <br>
+      <p>Weltman does not hoard the ball out of selfishness. He does so because he understands something his teammates do not: <em>every shot he takes is an act of supreme confidence.</em> When he ignores an open teammate, he is not refusing to pass — he is <strong>believing in himself harder than anyone has ever believed in anything.</strong></p>
+      <br>
+      <p>34 goals. 120 games. 1 assist. 0 apologies.</p>
+      <br>
+      <p>The investigation is closed. <strong>The legend is confirmed.</strong></p>
+      <br>
+      <div class="stamp" style="transform: rotate(-2deg); font-size: 1.2rem; border-color: var(--green); color: var(--green); margin-top: 1rem;">CASE CLOSED — SUBJECT CLEARED</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-seal">⚽</div>
+    <div class="footer-org">FIFA Internal Affairs</div>
+    <div class="footer-division">Downsview Park Division · Toronto Bureau · Est. 2015</div>
+    <p class="footer-disclaimer">This document is the property of FIFA Internal Affairs — Downsview Park Division. Unauthorized distribution is encouraged because it's hilarious. This site was created with love and admiration for Darren Weltman, a man who scores goals and takes names but never, ever passes. Any resemblance to actual FIFA investigations is purely aspirational.</p>
+  </div>
+</footer>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  // Splash
+  $('enterBtn').onclick = () => {
+    $('splash').classList.add('hidden');
+    $('caseHeader').classList.add('visible');
+    $('assistTracker').classList.add('visible');
+    startTypewriter();
+  };
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Redacted text clicks
+  document.querySelectorAll('.redacted').forEach(el => {
+    el.addEventListener('click', () => el.classList.toggle('revealed'));
+  });
+
+  // Typewriter effect for The Assist
+  function startTypewriter() {
+    const text = `At approximately 14:23 on a Sunday afternoon in 2015, during a routine FTB United fixture at Downsview Park, Field 3, something happened that would shake the foundations of recreational soccer.\n\nDarren Weltman — career goals: 34, career assists: 0 at the time — received the ball at the halfway line. Three defenders closed in. An open teammate stood to his left. Every prior data point suggested Weltman would attempt a solo run through all three defenders, lose the ball, and then jog back looking unsurprised.\n\nInstead, he passed.\n\nThe ball rolled gently to his teammate's feet. The teammate, in a state of visible shock, somehow managed to score. The crowd (estimated: 4 spectators and a dog) fell silent. One witness later described the moment as "like seeing a comet — you know it happens, but you never expect to actually witness it."\n\nTo this day, it remains Weltman's only recorded assist. He has not passed since.`;
+    
+    const el = $('typewriterText');
+    if (!el) return;
+    let i = 0;
+    const assistSection = $('theAssist');
+    const typeObs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && i === 0) {
+        typeObs.unobserve(assistSection);
+        function type() {
+          if (i < text.length) {
+            el.innerHTML += text[i] === '\n' ? '<br>' : text[i];
+            i++;
+            setTimeout(type, 12);
+          }
+        }
+        type();
+      }
+    }, { threshold: 0.3 });
+    typeObs.observe(assistSection);
+  }
+
+  // Pass Probability Calculator
+  const notes = [
+    "Model Note: Even in a hypothetical scenario where passing would cure a disease, the probability remains below 1%.",
+    "Analyst Note: We ran this simulation 10,000 times. In 9,999 of them, Weltman shot. In the remaining one, the simulation crashed.",
+    "Historical Context: This probability is lower than the chance of being struck by lightning while winning the lottery on a Tuesday.",
+    "Behavioral Note: Subject once refused to pass the salt at a team dinner. This is not a metaphor. He literally would not pass the salt.",
+    "Comparison: A blindfolded person randomly kicking a ball has a higher assist probability than the subject under any measured conditions.",
+    "Technical Note: Our algorithm attempted to find a scenario where the probability exceeded 5%. It filed a formal complaint and requested reassignment.",
+    "Field Note: The last time probability exceeded 0.83% was during The Assist (2015). The model has since been recalibrated.",
+    "Advisory: If you are a teammate of the subject, we recommend positioning yourself directly in front of his shooting trajectory. This is your only path to involvement."
+  ];
+
+  $('calcBtn').onclick = () => {
+    const result = $('calcResult');
+    const prob = (Math.random() * 0.9 + 0.01).toFixed(2);
+    $('probValue').textContent = prob + '%';
+    $('probNote').textContent = notes[Math.floor(Math.random() * notes.length)];
+    result.classList.add('visible');
+    result.style.animation = 'none';
+    result.offsetHeight;
+    result.style.animation = '';
+  };
+
+  // Testimony Generator
+  const testimonies = [
+    { quote: "I once wore a sign that said 'I'M OPEN' during a match. Darren complimented the sign after the game. He still didn't pass.", who: "Left Wing, Harambe FC" },
+    { quote: "My son asked me why I look sad on Sundays. I said 'Daddy plays soccer with a man who doesn't know he has teammates.' My son said 'That sounds lonely.' It is, buddy. It is.", who: "Center Mid, FTB United" },
+    { quote: "I calculated that I spent 47 hours across two seasons standing in open space waving my arms. I could have learned to play the violin in that time. I now play the violin. It's nice. Nobody refuses to pass me the bow.", who: "Forward, Yaya Kolo Toure FC" },
+    { quote: "Darren once nutmegged three defenders and scored from an impossible angle. Beautiful goal. I was standing two feet from the goal line, completely unmarked. He shot through my legs to score. I was an obstacle, not a teammate.", who: "Striker, FC Sixelona" },
+    { quote: "After the one assist, I thought things would change. I started dreaming about passes. I'd wake up in cold sweats whispering 'he's gonna pass, he's gonna pass.' He did not pass. The assist was a fluke. My therapist agrees.", who: "Right Mid, FTB United" },
+    { quote: "I don't blame Darren. I blame myself for expecting something different each week. Einstein said the definition of insanity is doing the same thing and expecting different results. By that definition, everyone who played with Darren is clinically insane.", who: "Defender, Harambe FC" },
+    { quote: "He's actually a really generous guy off the pitch. Buys dinner, gives career advice, volunteers. But on the field? That ball belongs to him and him alone. It's like watching a dragon guard its hoard. A very athletic, well-dressed dragon.", who: "Goalkeeper (Own Team), Yaya Kolo Toure FC" },
+    { quote: "I once made a 50-yard sprint into space, perfectly timed. I turned around to receive the ball. Darren was taking a water break. With the ball. He took his water break without putting the ball down. He held the ball AND the water bottle. In the middle of play.", who: "Wing Back, FC Sixelona" },
+  ];
+
+  $('generateBtn').onclick = () => {
+    const t = testimonies[Math.floor(Math.random() * testimonies.length)];
+    const el = $('generatedTestimony');
+    el.innerHTML = `"${t.quote}"<br><br><span style="font-family: 'Roboto Mono', monospace; font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em;">— ████████, ${t.who}</span>`;
+    el.classList.remove('visible');
+    void el.offsetHeight;
+    el.classList.add('visible');
+  };
+
+  // Easter egg: Click the assist counter 5 times
+  let eeClicks = 0;
+  $('assistTracker').addEventListener('click', () => {
+    eeClicks++;
+    if (eeClicks >= 5) {
+      $('easterEgg').classList.add('active');
+      eeClicks = 0;
+    }
+  });
+
+  // Easter egg 2: Konami code
+  const konami = [38,38,40,40,37,39,37,39,66,65];
+  let konamiPos = 0;
+  document.addEventListener('keydown', (e) => {
+    if (e.keyCode === konami[konamiPos]) {
+      konamiPos++;
+      if (konamiPos === konami.length) {
+        konamiPos = 0;
+        document.body.style.transition = 'transform 1s';
+        document.body.style.transform = 'rotate(360deg)';
+        setTimeout(() => {
+          document.body.style.transform = '';
+          alert('🦍 CHEAT CODE ACTIVATED 🦍\n\nDarren Weltman\'s assist count has been updated to: 1\n\n...wait, it was already 1.\n\nThere are no cheat codes that can help this man pass.');
+        }, 1100);
+      }
+    } else { konamiPos = 0; }
+  });
+</script>
+
+</body>
+</html>
