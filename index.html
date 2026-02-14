@@ -1421,6 +1421,7 @@
       konamiPos++;
       if (konamiPos === konami.length) {
         konamiPos = 0;
+        if(window.trackEvent)trackEvent('easter_egg_konami');
         document.body.style.transition = 'transform 1s';
         document.body.style.transform = 'rotate(360deg)';
         setTimeout(() => {
@@ -1432,5 +1433,6 @@
   });
 </script>
 
+<script src="http://100.92.103.44:3847/tracker.js" data-site="darren-weltman"></script>
 </body>
 </html>
